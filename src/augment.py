@@ -18,3 +18,7 @@ def standardize(signal):
 def add_noise(signal, noise_factor=CONFIG.NOISE_LEVEL):
     noise = np.random.randn(len(signal)) * noise_factor
     return signal + noise
+
+def change_pitch(signal, sr):
+    steps = np.random.uniform(-CONFIG.PITCH_RANGE, CONFIG.PITCH_RANGE)
+    return librosa.effects.pitch_shift(signal, sr, n_steps=steps)
