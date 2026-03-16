@@ -14,3 +14,7 @@ def standardize(signal):
     else:
         signal = signal[:target]
     return signal
+
+def add_noise(signal, noise_factor=CONFIG.NOISE_LEVEL):
+    noise = np.random.randn(len(signal)) * noise_factor
+    return signal + noise
