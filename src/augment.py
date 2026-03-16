@@ -22,3 +22,7 @@ def add_noise(signal, noise_factor=CONFIG.NOISE_LEVEL):
 def change_pitch(signal, sr):
     steps = np.random.uniform(-CONFIG.PITCH_RANGE, CONFIG.PITCH_RANGE)
     return librosa.effects.pitch_shift(signal, sr, n_steps=steps)
+
+def change_speed(signal):
+    rate = np.random.uniform(*CONFIG.SPEED_RANGE)
+    return librosa.effects.time_stretch(signal, rate)
