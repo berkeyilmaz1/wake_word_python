@@ -52,3 +52,25 @@ def augment_file(file_path,output_path,n_copies):
         signal_aug= standardize(augmented)
         output_file = os.path.join(output_path, f"{base_name}_aug_{i}.wav")
         sf.write(output_file, signal_aug, sr)
+
+
+def run():
+    for raw_dir, aug_dir in [
+        (CONFIG.RAW_POS_DIR, CONFIG.AUG_POS_DIR),
+        (CONFIG.RAW_NEG_DIR, CONFIG.AUG_NEG_DIR)
+    ]:
+        files = [f for f in os.listdir(raw_dir) if f.endswith(".wav")]
+        print(f"{raw_dir}: {len(files)} orijinal dosya bulundu")
+
+        for f in files:
+            augment_file(
+                os.path.join(raw_dir, f),
+                aug_dir,
+                CONFIG.AUGMENT_COPIES
+            )
+        print(f"  → {aug_dir} klasörüne yazıldı")
+
+    print("✅ Augmentation tamamlandı.")
+
+if __name__ == "__main__":
+    run()
