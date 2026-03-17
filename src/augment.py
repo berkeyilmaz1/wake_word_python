@@ -52,6 +52,7 @@ def run():
         (CONFIG.RAW_POS_DIR, CONFIG.AUG_POS_DIR),
         (CONFIG.RAW_NEG_DIR, CONFIG.AUG_NEG_DIR)
     ]:
+        os.makedirs(aug_dir, exist_ok=True)
         files = [f for f in os.listdir(raw_dir) if f.endswith(".wav")]
         print(f"{raw_dir}: {len(files)} orijinal dosya bulundu")
 

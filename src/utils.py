@@ -17,7 +17,8 @@ def extract_mfcc(signal, sr):
     Eğitimde ve runtime'da birebir aynı fonksiyon çağrılır.
     """
     signal = standardize(signal)
-    mfcc = librosa.feature.mfcc(y=signal, sr=sr, n_mfcc=CONFIG.N_MFCC)
-    mean = np.mean(mfcc, axis=1)
-    std  = np.std(mfcc, axis=1)
-    return np.concatenate([mean, std])
+    mfcc        = librosa.feature.mfcc(y=signal, sr=sr, n_mfcc=CONFIG.N_MFCC)
+    delta       = librosa.feature.delta(mfcc)
+    delta2      = librosa.feature.delta(mfcc, order=2)
+    features = np.concatenate([mfcc, delta, delta2], axis=0)
+    return np.concatenate([np.mean(features, axis=1), np.std(features, axis=1)])

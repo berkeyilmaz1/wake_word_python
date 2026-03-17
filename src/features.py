@@ -51,15 +51,19 @@ def run():
         print("⚠️ NaN tespit edildi! Bozuk ses dosyası olabilir.")
 
     feat_cols = [c for c in df.columns if c.startswith("F")]
-    tsne = TSNE(n_components=2, random_state=config.RANDOM_STATE, perplexity=30)
-    X2d  = tsne.fit_transform(df[feat_cols].values)
-    y    = df["Label"].values
+    try:
+        perplexity = min(30, len(df) - 1)
+        tsne = TSNE(n_components=2, random_state=config.RANDOM_STATE, perplexity=perplexity)
+        X2d  = tsne.fit_transform(df[feat_cols].values)
+        y    = df["Label"].values
 
-    plt.figure(figsize=(8, 6))
-    plt.scatter(X2d[y==1,0], X2d[y==1,1], c="green", alpha=0.5, label="Hey Pakize")
-    plt.scatter(X2d[y==0,0], X2d[y==0,1], c="red",   alpha=0.5, label="Negatif")
-    plt.legend()
-    plt.title("t-SNE: MFCC Feature Space")
-    plt.savefig(os.path.join(config.OUTPUT_DIR, "tsne_plot.png"))
-    plt.close()
-    print("✅ t-SNE grafiği kaydedildi.")
+        plt.figure(figsize=(8, 6))
+        plt.scatter(X2d[y==1,0], X2d[y==1,1], c="green", alpha=0.5, label="Hey Pakize")
+        plt.scatter(X2d[y==0,0], X2d[y==0,1], c="red",   alpha=0.5, label="Negatif")
+        plt.legend()
+        plt.title("t-SNE: MFCC Feature Space")
+        plt.savefig(os.path.join(config.OUTPUT_DIR, "tsne_plot.png"))
+        plt.close()
+        print("✅ t-SNE grafiği kaydedildi.")
+    except Exception as e:
+        print(f"⚠️ t-SNE oluşturulamadı: {e}")

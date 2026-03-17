@@ -30,11 +30,10 @@ def run():
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled  = scaler.transform(X_test)
 
-    param_grid = {
-        'C': [0.1, 1, 10,100],
-        'gamma': ['scale', 'auto', 0.001, 0.01],
-        'kernel': ['rbf', 'linear']
-    }
+    param_grid = [
+        {'kernel': ['rbf'],    'C': [0.1, 1, 10], 'gamma': ['scale', 0.01]},
+        {'kernel': ['linear'], 'C': [0.1, 1, 10]},
+    ]
 
     grid = GridSearchCV(
         SVC(probability=True), param_grid,
