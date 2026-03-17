@@ -11,14 +11,16 @@ def standardize(signal):
         signal = signal[:target]
     return signal
 
-def extract_mfcc(signal, sr):
-    """
-    Ses verisinden MFCC öznitelik vektörü çıkarır.
-    Eğitimde ve runtime'da birebir aynı fonksiyon çağrılır.
-    """
-    signal = standardize(signal)
-    mfcc        = librosa.feature.mfcc(y=signal, sr=sr, n_mfcc=CONFIG.N_MFCC)
-    delta       = librosa.feature.delta(mfcc)
-    delta2      = librosa.feature.delta(mfcc, order=2)
-    features = np.concatenate([mfcc, delta, delta2], axis=0)
-    return np.concatenate([np.mean(features, axis=1), np.std(features, axis=1)])
+def extract_mfcc(y, sr):
+    y = standardize(y)
+    mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=CONFIG.N_MFCC)
+    
+    delta  = librosa.feature.delta(mfcc)
+    delta2 = librosa.feature.delta(mfcc, order=2)
+
+    mean = np.mean(mfcc,    axis=1)
+    std  = np.std(mfcc,     axis=1)
+    d1   = np.mean(delta,   axis=1)
+    d2   = np.mean(delta2,  axis=1)
+
+    return np.concatenate([mean, std, d1, d2])

@@ -14,11 +14,12 @@ TARGET_DURATION  = 1.5     # saniye padding ve cropping için
 N_MFCC           = 20      # MFCC katsayısı
 
 # ── Data augmentation ayarları ─────────────────────────────
-AUGMENT_COPIES   = 3       # her orijinal kayıttan kaç varyasyon üretilsin
-NOISE_LEVEL      = 0.02    # white noise şiddeti (%3)
-PITCH_RANGE      = 1       # yarım ton (±2)
+AUGMENT_COPIES   = 4       # her orijinal kayıttan kaç varyasyon üretilsin
+NOISE_LEVEL      = 0.01    # white noise şiddeti (%3)
+PITCH_RANGE      = 1.5       # yarım ton (±2)
 SPEED_RANGE      = (0.9, 1.1)  # hız aralığı
 
 # ── Model ayarları ─────────────────────────────────────────
 TEST_SIZE        = 0.2     # verinin %20'si test için ayrılır
 RANDOM_STATE     = 42      # tekrarlanabilir sonuçlar için sabit seed
+WAKE_WORD_THRESHOLD = 0.6  # Tahminin pozitif sayılması için gereken minimum olasılık

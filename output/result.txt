@@ -1,0 +1,11 @@
+✅ En iyi parametreler : {'C': 10, 'gamma': 'scale', 'kernel': 'rbf'}
+   CV F1               : 0.7178
+
+              precision    recall  f1-score   support
+
+     Negatif       0.88      0.88      0.88       245
+  Hey Pakize       0.76      0.76      0.76       125
+
+    accuracy                           0.84       370
+   macro avg       0.82      0.82      0.82       370
+weighted avg       0.84      0.84      0.84       370

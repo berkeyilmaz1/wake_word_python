@@ -33,8 +33,7 @@ def augment_file(file_path,output_path,n_copies):
         augmented = signal.copy()
         ops = np.random.choice(
             [add_noise,
-             lambda a: change_pitch(a, sr),
-             change_speed],
+             lambda a: change_pitch(a, sr)],
             size=np.random.randint(1, 3),
             replace=False
         )

@@ -36,7 +36,7 @@ def run():
     ]
 
     grid = GridSearchCV(
-        SVC(probability=True), param_grid,
+        SVC(probability=True,class_weight="balanced"), param_grid,
         cv=5, scoring="f1", n_jobs=-1, verbose=1
     )
     grid.fit(X_train_scaled, y_train)

@@ -1,43 +1,26 @@
-# src/predict.py
-# Mikrofon tahmin motoru.
-# Doğrudan çalışmaz — UI tarafından Thread içinde çağrılır.
-
 import os
 import sys
 import numpy as np
 import sounddevice as sd
 import joblib
-import librosa
-import threading
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 import config
 from src.utils import extract_mfcc
 
 class WakeWordDetector:
-    """
-    UI'dan şu şekilde kullanılır:
-        detector = WakeWordDetector(on_result=callback_fn)
-        detector.start()   # dinlemeye başla
-        detector.stop()    # durdur
-    """
-
     def __init__(self, on_result):
-        """
-        on_result: her tahmin sonucunda çağrılacak fonksiyon.
-                   (label: int, confidence: float) alır.
-        """
-        self.on_result  = on_result
-        self.running    = False
-        self._stream    = None
+        self.on_result = on_result
+        self.running   = False
+        self._stream   = None
 
         model_path  = os.path.join(config.MODEL_DIR, "svm_model.pkl")
         scaler_path = os.path.join(config.MODEL_DIR, "scaler.pkl")
 
         if not os.path.exists(model_path):
-            raise FileNotFoundError(
-                "Model bulunamadı! Önce train_pipeline.py çalıştırın."
-            )
+            raise FileNotFoundError("Model bulunamadı! Önce train_pipeline.py çalıştırın.")
+        if not os.path.exists(scaler_path):
+            raise FileNotFoundError("Scaler bulunamadı! Önce train_pipeline.py çalıştırın.")
 
         self.model  = joblib.load(model_path)
         self.scaler = joblib.load(scaler_path)
@@ -45,12 +28,23 @@ class WakeWordDetector:
     def _callback(self, indata, frames, time, status):
         if not self.running:
             return
+
         y = indata[:, 0] if indata.ndim > 1 else indata.flatten()
-        features = extract_mfcc(y, config.SAMPLE_RATE)
-        features_scaled = self.scaler.transform([features])
-        label      = self.model.predict(features_scaled)[0]
-        confidence = self.model.predict_proba(features_scaled)[0][label]
-        self.on_result(label, confidence)
+
+        # Sessizliği filtrele
+        rms = np.sqrt(np.mean(y ** 2))
+        if rms < 0.01:
+            self.on_result(0, 0.0)
+            return
+
+        features    = extract_mfcc(y, config.SAMPLE_RATE)
+        scaled      = self.scaler.transform([features])
+        probability = self.model.predict_proba(scaled)[0][1]  # her zaman pozitif olasılığı
+
+        if probability >= config.WAKE_WORD_THRESHOLD:
+            self.on_result(1, probability)
+        else:
+            self.on_result(0, probability)
 
     def start(self):
         self.running = True
