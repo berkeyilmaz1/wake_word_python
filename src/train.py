@@ -40,10 +40,10 @@ def run():
         SVC(probability=True), param_grid,
         cv=5, scoring="f1", n_jobs=-1, verbose=1
     )
-    grid.fit(X_train, y_train)
+    grid.fit(X_train_scaled, y_train)
 
     best = grid.best_estimator_
-    y_pred = best.predict(X_test)
+    y_pred = best.predict(X_test_scaled)
 
     print(f"\n✅ En iyi parametreler : {grid.best_params_}")
     print(f"   CV F1               : {grid.best_score_:.4f}\n")

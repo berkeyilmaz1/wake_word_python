@@ -39,7 +39,7 @@ def run():
     ]:
         rows += collect(d, lbl)
     df = pd.DataFrame(rows)
-    df.to_csv(config.OUTPUT_DIR, exist_ok=True)
+    os.makedirs(config.OUTPUT_DIR, exist_ok=True)
     csv_path = os.path.join(config.OUTPUT_DIR, "dataset.csv")
     df.to_csv(csv_path, index=False)
 
@@ -50,7 +50,7 @@ def run():
     if df.isnull().sum().sum() > 0:
         print("⚠️ NaN tespit edildi! Bozuk ses dosyası olabilir.")
 
-        feat_cols = [c for c in df.columns if c.startswith("F")]
+    feat_cols = [c for c in df.columns if c.startswith("F")]
     tsne = TSNE(n_components=2, random_state=config.RANDOM_STATE, perplexity=30)
     X2d  = tsne.fit_transform(df[feat_cols].values)
     y    = df["Label"].values

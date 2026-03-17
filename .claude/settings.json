@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ffmpeg -version)",
+      "Bash(winget install:*)",
+      "Bash(python -c \":*)"
+    ]
+  }
+}
