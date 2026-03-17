@@ -1,8 +1,3 @@
-# ui/app.py
-# Tkinter arayüzü.
-# predict.py'daki WakeWordDetector'ı Thread'siz kullanır
-# çünkü sounddevice zaten kendi callback thread'ini yönetiyor.
-
 import tkinter as tk
 from tkinter import scrolledtext
 from datetime import datetime
@@ -21,15 +16,14 @@ class App:
         root.title("Hey Pakize — Wake Word Detector")
         root.geometry("500x420")
         root.resizable(False, False)
+        root.protocol("WM_DELETE_WINDOW", self._on_close)
 
-        # ── Durum göstergesi ────────────────────────────────
         self.status_label = tk.Label(
             root, text="⏹  Bekliyor",
             font=("Helvetica", 18, "bold"), fg="gray"
         )
         self.status_label.pack(pady=(30, 10))
 
-        # ── Güven çubuğu ────────────────────────────────────
         self.confidence_var = tk.DoubleVar(value=0)
         self.progress = tk.Scale(
             root, variable=self.confidence_var,
@@ -39,7 +33,6 @@ class App:
         )
         self.progress.pack(pady=(0, 20))
 
-        # ── Başlat / Durdur butonu ───────────────────────────
         self.btn = tk.Button(
             root, text="🎙  Dinlemeye Başla",
             font=("Helvetica", 13),
@@ -49,7 +42,6 @@ class App:
         )
         self.btn.pack(pady=(0, 20))
 
-        # ── Log ekranı ───────────────────────────────────────
         self.log = scrolledtext.ScrolledText(
             root, height=8, width=58,
             font=("Courier", 10), state="disabled"
@@ -71,24 +63,25 @@ class App:
             self._stop()
 
     def _start(self):
-        self.running = True
-        self.detector.start()
-        self.btn.config(text="⏹  Durdur", bg="#f44336")
-        self.status_label.config(text="🎙  Dinleniyor...", fg="blue")
-        self._log("── Dinleme başladı ──────────────────────")
+        try:
+            self.detector.start()
+            self.running = True
+            self.btn.config(text="⏹  Durdur", bg="#f44336")
+            self.status_label.config(text="🎙  Dinleniyor...", fg="blue")
+            self._log("── Dinleme başladı ──────────────────────")
+        except Exception as e:
+            self._log(f"❌ Mikrofon başlatılamadı: {e}")
 
     def _stop(self):
-        self.running = False
         self.detector.stop()
+        self.running = False
         self.btn.config(text="🎙  Dinlemeye Başla", bg="#4CAF50")
         self.status_label.config(text="⏹  Bekliyor", fg="gray")
         self.confidence_var.set(0)
         self._log("── Dinleme durduruldu ───────────────────")
 
     def on_result(self, label, confidence):
-        """Detector her tahmin yaptığında bu çağrılır."""
         pct = round(confidence * 100, 1)
-        # UI güncellemeleri ana thread'den yapılmalı
         self.root.after(0, self._update_ui, label, pct)
 
     def _update_ui(self, label, pct):
@@ -97,15 +90,24 @@ class App:
             self.status_label.config(text="🟢  HEY PAKİZE!", fg="green")
             ts = datetime.now().strftime("%H:%M:%S")
             self._log(f"[{ts}] 🟢 HEY PAKİZE! — güven: %{pct}")
+            self.root.after(2000, self._reset_status)
         else:
             self.status_label.config(text="🎙  Dinleniyor...", fg="blue")
+
+    def _reset_status(self):
+        if self.running:
+            self.status_label.config(text="🎙  Dinleniyor...", fg="blue")
+
+    def _on_close(self):
+        if self.running:
+            self.detector.stop()
+        self.root.destroy()
 
     def _log(self, msg):
         self.log.config(state="normal")
         self.log.insert("end", msg + "\n")
         self.log.see("end")
         self.log.config(state="disabled")
-
 
 def run():
     root = tk.Tk()
