@@ -3,19 +3,12 @@ import config  as CONFIG
 import numpy as np
 import os
 import soundfile as sf 
+import utils as UTILS
 
 def load_audio(path):
     signal, sr = librosa.load(path, sr=CONFIG.SAMPLE_RATE)
     return signal, sr
 
-def standardize(signal):
-    """Padding veya cropping ile sabit uzunluğa getirir."""
-    target = int(CONFIG.SAMPLE_RATE * CONFIG.TARGET_DURATION)
-    if len(signal) < target:
-        signal = np.pad(signal, (0, target - len(signal)))
-    else:
-        signal = signal[:target]
-    return signal
 
 def add_noise(signal, noise_factor=CONFIG.NOISE_LEVEL):
     noise = np.random.randn(len(signal)) * noise_factor
@@ -31,7 +24,7 @@ def change_speed(signal):
 
 def augment_file(file_path,output_path,n_copies):
     signal, sr = load_audio(file_path)
-    signal = standardize(signal)
+    signal = UTILS.standardize(signal)
 
     base_name = os.path.splitext(os.path.basename(file_path))[0]
 
