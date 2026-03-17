@@ -3,7 +3,7 @@ import config  as CONFIG
 import numpy as np
 import os
 import soundfile as sf 
-import utils as UTILS
+from src import utils as UTILS
 
 def load_audio(path):
     signal, sr = librosa.load(path, sr=CONFIG.SAMPLE_RATE)
@@ -42,7 +42,7 @@ def augment_file(file_path,output_path,n_copies):
         for op in ops:
             augmented = op(augmented)
         
-        signal_aug= standardize(augmented)
+        signal_aug = UTILS.standardize(augmented)
         output_file = os.path.join(output_path, f"{base_name}_aug_{i}.wav")
         sf.write(output_file, signal_aug, sr)
 
